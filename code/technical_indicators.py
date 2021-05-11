@@ -49,7 +49,7 @@ def relative_strength_index(prices: pd.Series, n: int) -> pd.Series:
   return 100 - 100 / (1 + rs)
 
 
-def stochastic_oscillator(d_type: str = 'sma', prices: pd.Series, n: int) -> pd.Series:
+def stochastic_oscillator(prices: pd.Series, n: int, d_type: str = 'sma') -> pd.Series:
   """
   Calculate n-day stochastic %K and %D for given data.
 
