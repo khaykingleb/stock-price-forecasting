@@ -3,10 +3,10 @@ import pandas as pd
 def simple_moving_average(prices: pd.Series, n: int) -> pd.Series:
   """
   Calculate simple n-day moving average for given data.
-
+  
   Params:
-      
-  Returns:
+    prices:
+    n:
   """
   return prices.rolling(window=n).mean()
 
@@ -47,7 +47,29 @@ def relative_strength_index(prices: pd.Series, n: int) -> pd.Series:
   rs = ups.ewm(com=n-1, min_periods=n).mean() / downs.ewm(com=n-1, min_periods=n).mean()
 
   return 100 - 100 / (1 + rs)
-    
 
+
+def stochastic_oscillator(d_type='sma': str, prices: pd.Series, n: int) -> pd.Series:
+  """
+  Calculate n-day stochastic %K and %D for given data.
+
+  Params:
+
+  Returns:
+  """
+  highest_high = prices.rolling(window=n).max()
+  lowest_low = prices.rolling(window=n).min()
+
+  stochastic_k = ((prices - lowest_low) / (highest_high - lowest_low)) * 100
+
+  if d_type == 'sma': 
+      stochastic_d = simple_moving_average(stochastic_k, n)
+  elif d_type == 'wma':
+      stochastic_d = weighted_moving_average(stochastic_k, n)
+  elif d_type == 'ema':
+      stochastic_d = exponential_moving_average(stochastic_k, n)
+  else:
+      raise ValueError('Only sma, wma and ema are available.')
+
+  return stochastic_k, stochastic_d
  
-
