@@ -1,17 +1,18 @@
 import pandas as pd
+from typing import Tuple
 
-def simple_moving_average(prices: pd.Series, n: int) -> pd.Series:
+def simple_moving_average(df: pd.DataFrame, n: int, prices: str = 'Close') -> pd.Series:
   """
   Calculate simple n-day moving average for given data.
   
   Params:
-    prices:
-    n:
+  
+  Returns:
   """
-  return prices.rolling(window=n).mean()
+  return df[f'{prices}'].rolling(window=n).mean()
 
 
-def weighted_moving_average(prices: pd.Series, n: int) -> pd.Series:
+def weighted_moving_average(df: pd.DataFrame, n: int, prices: str = 'Close') -> pd.Series:
   """
   Calculate weighted n-day moving average for given data.
 
@@ -19,10 +20,10 @@ def weighted_moving_average(prices: pd.Series, n: int) -> pd.Series:
       
   Returns:
   """
-  return prices.rolling(window=n).apply(lambda x: x[::-1].cumsum().sum() * 2 / n / (n + 1))
+  return df[f'{prices}'].rolling(window=n).apply(lambda x: x[::-1].cumsum().sum() * 2 / n / (n + 1))
 
 
-def exponential_moving_average(prices: pd.Series, n: int) -> pd.Series:
+def exponential_moving_average(df: pd.DataFrame, n: int, prices: str = 'Close') -> pd.Series:
     """
     Calculate exponential n-day moving average for given data.
 
@@ -30,10 +31,10 @@ def exponential_moving_average(prices: pd.Series, n: int) -> pd.Series:
         
     Returns:
     """
-    return prices.ewm(span=n).mean()
+    return df[f'{prices}'].ewm(span=n).mean()
   
   
-def relative_strength_index(prices: pd.Series, n: int) -> pd.Series:
+def relative_strength_index(df: pd.DataFrame, n: int, prices: str = 'Close') -> pd.Series:
   """
   Calculate n-day relative strength index for given data.
 
@@ -41,15 +42,15 @@ def relative_strength_index(prices: pd.Series, n: int) -> pd.Series:
 
   Returns:
   """
-  deltas = prices.diff()
+  deltas = df[f'{prices}'].diff()
   ups = deltas.clip(lower=0)
   downs = (-deltas).clip(lower=0)
   rs = ups.ewm(com=n-1, min_periods=n).mean() / downs.ewm(com=n-1, min_periods=n).mean()
+  rsi = 100 - 100 / (1 + rs)
+  return rsi
 
-  return 100 - 100 / (1 + rs)
 
-
-def stochastic_oscillator(prices: pd.Series, n: int, d_type: str = 'sma') -> pd.Series:
+def stochastic_oscillator(df: pd.DataFrame, n: int, prices: str = 'Close', d_type: str = 'sma') -> pd.Series:
   """
   Calculate n-day stochastic %K and %D for given data.
 
@@ -57,8 +58,8 @@ def stochastic_oscillator(prices: pd.Series, n: int, d_type: str = 'sma') -> pd.
 
   Returns:
   """
-  highest_high = prices.rolling(window=n).max()
-  lowest_low = prices.rolling(window=n).min()
+  highest_high = df[f'{prices}'].rolling(window=n).max()
+  lowest_low = df[f'{prices}'].rolling(window=n).min()
 
   stochastic_k = ((prices - lowest_low) / (highest_high - lowest_low)) * 100
 
@@ -69,7 +70,50 @@ def stochastic_oscillator(prices: pd.Series, n: int, d_type: str = 'sma') -> pd.
   elif d_type == 'ema':
       stochastic_d = exponential_moving_average(stochastic_k, n)
   else:
-      raise ValueError('Only sma, wma and ema are available.')
+      raise ValueError('Only SMA, WMA and EMA are available.')
 
   return stochastic_k, stochastic_d
- 
+
+
+def bollinger_bands(df: pd.DataFrame, n: int = 20, m: float = 2.0) -> Tuple[pd.Series]:
+  """
+  Calculate bollinger bands for given data.
+
+  Params:
+      n: number of days in smoothing period
+      m: number of standard deviations away from moving avergae
+      
+  Returns:
+  """
+  typical_price = (df['High'] + df['Low'] + df['Close']) / 3
+
+  sma = typical_price.rolling(window=n, min_periods=n).mean()
+  sigma = typical_price.rolling(window=n, min_periods=n).std()
+
+  upper_bollinger_band = sma + m * sigma
+  lower_bollinger_band = sma - m * sigma
+
+  return lower_bollinger_band, upper_bollinger_band
+
+
+def moving_average_convergence_divergence(df: pd.DataFrame, n_fast: int = 12, 
+                                          n_slow: int = 26, n_signal: int = 9) -> Tuple[pd.Series]:
+    """
+    Calculate MACD, MACD Signal and MACD difference for given data.
+
+    Params:
+        n_fast:
+        n_slow:
+        n_signal:
+        
+    Returns:
+    """
+    ema_fast = exponential_moving_average(df, n=n_fast)
+    ema_slow = exponential_moving_average(df, n=n_slow)
+
+    macd = ema_fast - ema_slow
+    macd_signal = macd.ewm(span=n_signal, min_periods=n_signal).mean()
+    macd_difference = macd - macd_signal
+
+    return macd, macd_signal, macd_difference
+  
