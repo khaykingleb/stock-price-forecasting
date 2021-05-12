@@ -58,8 +58,8 @@ def stochastic_oscillator(df: pd.DataFrame, n: int, prices: str = 'Close', d_typ
 
   Returns:
   """
-  highest_high = df[prices].rolling(window=n).max()
-  lowest_low = df[prices].rolling(window=n).min()
+  highest_high = df[prices].rolling(window=n, min_periods=n).max()
+  lowest_low = df[prices].rolling(window=n, min_periods=n).min()
 
   stochastic_k = pd.DataFrame(((df[prices] - lowest_low) / (highest_high - lowest_low)) * 100)
 
@@ -116,4 +116,3 @@ def moving_average_convergence_divergence(df: pd.DataFrame, n_fast: int = 12,
     macd_difference = macd - macd_signal
 
     return macd, macd_signal, macd_difference
-  
