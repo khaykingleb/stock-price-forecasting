@@ -9,7 +9,7 @@ def simple_moving_average(df: pd.DataFrame, n: int = 10, prices: str = 'Close') 
   
   Returns:
   """
-  return df[f'{prices}'].rolling(window=n, min_periods=n).mean()
+  return df[prices].rolling(window=n, min_periods=n).mean()
 
 
 def weighted_moving_average(df: pd.DataFrame, n: int = 10, prices: str = 'Close') -> pd.Series:
@@ -20,7 +20,7 @@ def weighted_moving_average(df: pd.DataFrame, n: int = 10, prices: str = 'Close'
       
   Returns:
   """
-  return df[f'{prices}'].rolling(window=n, min_periods=n).apply(lambda x: x[::-1].cumsum().sum() * 2 / n / (n + 1))
+  return df[prices].rolling(window=n, min_periods=n).apply(lambda x: x[::-1].cumsum().sum() * 2 / n / (n + 1))
 
 
 def exponential_moving_average(df: pd.DataFrame, n: int = 10, prices: str = 'Close') -> pd.Series:
@@ -31,7 +31,7 @@ def exponential_moving_average(df: pd.DataFrame, n: int = 10, prices: str = 'Clo
         
     Returns:
     """
-    return df[f'{prices}'].ewm(span=n, min_periods=n).mean()
+    return df[prices].ewm(span=n, min_periods=n).mean()
   
   
 def relative_strength_index(df: pd.DataFrame, n: int, prices: str = 'Close') -> pd.Series:
@@ -42,7 +42,7 @@ def relative_strength_index(df: pd.DataFrame, n: int, prices: str = 'Close') -> 
 
   Returns:
   """
-  deltas = df[f'{prices}'].diff()
+  deltas = df[prices].diff()
   ups = deltas.clip(lower=0)
   downs = (-deltas).clip(lower=0)
   rs = ups.ewm(com=n-1, min_periods=n).mean() / downs.ewm(com=n-1, min_periods=n).mean()
@@ -58,10 +58,10 @@ def stochastic_oscillator(df: pd.DataFrame, n: int, prices: str = 'Close', d_typ
 
   Returns:
   """
-  highest_high = df[f'{prices}'].rolling(window=n).max()
-  lowest_low = df[f'{prices}'].rolling(window=n).min()
+  highest_high = df[prices].rolling(window=n).max()
+  lowest_low = df[prices].rolling(window=n).min()
 
-  stochastic_k = pd.DataFrame(((df[f'{prices}'] - lowest_low) / (highest_high - lowest_low)) * 100)
+  stochastic_k = pd.DataFrame(((df[prices] - lowest_low) / (highest_high - lowest_low)) * 100)
 
   if d_type == 'sma': 
       stochastic_d = simple_moving_average(stochastic_k, n)
