@@ -50,7 +50,7 @@ def relative_strength_index(df: pd.DataFrame, n: int, prices: str = 'Close') -> 
   return rsi
 
 
-def stochastic_oscillator(df: pd.DataFrame, n: int, prices: str = 'Close', d_type: str = 'sma') -> pd.Series:
+def stochastic_oscillator(df: pd.DataFrame, n: int, d_type: str = 'sma') -> pd.Series:
   """
   Calculate n-day stochastic %K and %D for given data.
 
@@ -58,12 +58,10 @@ def stochastic_oscillator(df: pd.DataFrame, n: int, prices: str = 'Close', d_typ
 
   Returns:
   """
-  highest_high = df[prices].rolling(window=n, min_periods=n).max()
-  lowest_low = df[prices].rolling(window=n, min_periods=n).min()
-  
-  sequence = df[prices]
+  highest_high = df['Close'].rolling(window=n, min_periods=n).max()
+  lowest_low = df['Close'].rolling(window=n, min_periods=n).min()
 
-  stochastic_k = pd.DataFrame(((sequence - lowest_low) / (highest_high - lowest_low)) * 100)
+  stochastic_k = pd.DataFrame(((df['Close'] - lowest_low) / (highest_high - lowest_low)) * 100)
 
   if d_type == 'sma': 
       stochastic_d = simple_moving_average(stochastic_k, n)
