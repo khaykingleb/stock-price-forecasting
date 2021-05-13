@@ -59,11 +59,10 @@ def stochastic_oscillator(df: pd.DataFrame, n_k: int = 14, n_d: int = 3,
 
   Returns:
   """
-  sequence = df[prices]
-  highest_high = sequence.rolling(window=n, min_periods=n).max()
-  lowest_low = sequence.rolling(window=n, min_periods=n).min()
+  highest_high = df[prices].rolling(window=n_k, min_periods=n_k).max()
+  lowest_low = df[prices].rolling(window=n_k, min_periods=n_k).min()
 
-  stochastic_k = pd.DataFrame(((sequence - lowest_low) / (highest_high - lowest_low)) * 100)
+  stochastic_k = pd.DataFrame(((df[prices] - lowest_low) / (highest_high - lowest_low)) * 100)
 
   if d_type == 'sma': 
       stochastic_d = simple_moving_average(stochastic_k, n_d)
