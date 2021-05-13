@@ -1,3 +1,19 @@
+import matplotlib.pyplot as plt
+plt.rcParams.update({
+    "text.usetex": False,
+    "font.family": "DejaVu Sans",
+    "font.sans-serif": ["Benton Sans"]})
+from IPython.display import clear_output
+from matplotlib.pylab import rcParams
+rcParams['figure.figsize'] = 10, 8
+
+import numpy as np
+import torch
+from torch import nn
+from torch import optim
+
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+
 def plot_metric(train_metric, test_metric, title):
     """
     """
