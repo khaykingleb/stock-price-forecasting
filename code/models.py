@@ -1,13 +1,18 @@
 import matplotlib.pyplot as plt
+
 plt.rcParams.update({
     "text.usetex": False,
     "font.family": "DejaVu Sans",
-    "font.sans-serif": ["Benton Sans"]})
+    "font.sans-serif": ["Benton Sans"]
+})
+
 from IPython.display import clear_output
+
 from matplotlib.pylab import rcParams
 rcParams['figure.figsize'] = 10, 8
 
 import numpy as np
+
 import torch
 from torch import nn
 from torch import optim
