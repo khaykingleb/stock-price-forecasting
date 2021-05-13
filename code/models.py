@@ -48,6 +48,7 @@ def predict(model, X, y_true, criterion):
 
     return test_loss
 
+
 def train(model, X_train, X_test, y_train, y_test, criterion, optimizer, 
           n_epochs=10, scheduler=None):
     """
