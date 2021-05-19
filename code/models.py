@@ -1,10 +1,8 @@
 import matplotlib.pyplot as plt
 
-plt.rcParams.update({
-    "text.usetex": False,
-    "font.family": "DejaVu Sans",
-    "font.sans-serif": ["Benton Sans"]
-})
+plt.rcParams.update({"text.usetex": False,
+                     "font.family": "DejaVu Sans",
+                     "font.sans-serif": ["Benton Sans"]})
 
 from IPython.display import clear_output
 
