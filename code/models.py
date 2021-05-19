@@ -9,6 +9,7 @@ plt.rcParams.update({
 from IPython.display import clear_output
 
 from matplotlib.pylab import rcParams
+
 rcParams['figure.figsize'] = 10, 8
 
 import numpy as np
@@ -19,49 +20,41 @@ from torch import optim
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-def plot_metric(train_metric, test_metric, title):
-    """
-    """
-    plt.title(title, pad=10, fontsize=18, loc='left')
-    
+
+def plot_metric(title, train_metric=None, test_metric=None, val_metric=None):
+    plt.title(title, pad=10, fontsize=18, loc='left', fontweight='bold')
     plt.ylabel('Loss', labelpad=10, fontsize=14)
     plt.xlabel('Epoch', labelpad=10, fontsize=14)
-    
-    if title == 'RMSE':
-        plt.plot(np.sqrt(train_metric), label='Train', zorder=1)
-        plt.plot(np.sqrt(test_metric), c='orange', label='Test', zorder=2)
-    else: 
+
+    if train_metric:
         plt.plot(train_metric, label='Train', zorder=1)
+
+    if test_metric:
         plt.plot(test_metric, c='orange', label='Test', zorder=2)
-        
+
+    if val_metric:
+        plt.plot(val_metric, label='Validation', zorder=3)
+
     plt.legend()
-    
     plt.show()
 
- 
-def train_one_epoch(model, X, y_true, criterion, optimizer):
-    """
-    """
-    model.train()
-    
-    y_pred = model(X.to(device))
 
+def train_one_epoch(model, X, y_true, criterion, optimizer):
+    model.train()
+    y_pred = model(X.to(device))
     loss = criterion(y_pred.unsqueeze(1), y_true.unsqueeze(1).to(device))
     train_loss = loss.item()
-    
-    # Helps prevent the exploding gradient problem in RNNs / LSTMs
+
     nn.utils.clip_grad_norm_(model.parameters(), 5)
-    
+
     loss.backward()
     optimizer.step()
     optimizer.zero_grad()
 
     return train_loss
 
-  
+
 def predict(model, X, y_true, criterion):
-    """
-    """
     model.eval()
     y_pred = model(X.to(device))
     loss = criterion(y_pred.unsqueeze(1), y_true.unsqueeze(1).to(device))
@@ -70,47 +63,91 @@ def predict(model, X, y_true, criterion):
     return test_loss
 
 
-def train(model, X_train, X_test, y_train, y_test, criterion, optimizer, 
-          n_epochs=10, scheduler=None):
-    """
-    """
+def train(model, criterion, optimizer, X_train, y_train, X_test=None, y_test=None,
+          n_epochs=10, verbose=True, return_loss_history=True, compute_test_loss=True):
     model.to(device)
 
     history_train_loss_by_epoch = []
     history_test_loss_by_epoch = []
 
     for epoch in range(n_epochs):
-        clear_output(wait=True)
-        print(f"Epoch: {epoch}") 
-        history_train_loss_by_epoch.append(train_one_epoch(model, X_train, y_train,
-                                                           criterion, optimizer))
-        
-        history_test_loss_by_epoch.append(predict(model, X_test, y_test, criterion))
-      
-        plot_metric(history_train_loss_by_epoch, history_test_loss_by_epoch, "RMSE")
+        history_train_loss_by_epoch.append(train_one_epoch(model, X_train, y_train, criterion, optimizer))
 
-        print(f"Test loss: {history_test_loss_by_epoch[-1]:.4}")
-  
-  
-class LongShortTermMemoryWithout(nn.Module):
-    """
-    """
-    def __init__(self, hidden_size=256, num_layers_LSTM=2, dropout_LSTM=0, dropout_FC=0.5):
-        super(LongShortTermMemoryWithout, self).__init__()
+        if compute_test_loss:
+            history_test_loss_by_epoch.append(predict(model, X_test, y_test, criterion))
+
+        if verbose:
+            clear_output(wait=True)
+            print(f"Epoch: {epoch + 1}")
+
+            plot_metric(f'{criterion.__class__.__name__}', history_train_loss_by_epoch, history_test_loss_by_epoch)
+
+            print(f"Train loss: {history_train_loss_by_epoch[-1]:.4}")
+
+            if compute_test_loss:
+                print(f"Test loss: {history_test_loss_by_epoch[-1]:.4}")
+
+    if return_loss_history:
+        return history_train_loss_by_epoch, history_test_loss_by_epoch
+
+
+def eval_losses(y_pred_train, y_true_train, y_pred_test, y_true_test):
+    print(f'Train RMSE = {np.sqrt(sum((y_pred_train - y_true_train) ** 2))[0]:.4}')
+    print(f'Test RMSE = {np.sqrt(sum((y_pred_test - y_true_test) ** 2))[0]:.4}')
+
+    print(f'Train MAE = {sum(np.abs(y_pred_train - y_true_train))[0]:.4}')
+    print(f'Test MAE = {sum(np.abs(y_pred_test - y_true_test))[0]:.4}')
+
+    smape_train = 100 / len(y_pred_train) * np.sum(
+        2 * np.abs(y_pred_train - y_true_train) / (np.abs(y_pred_train) + np.abs(y_true_train)))
+    smape_test = 100 / len(y_pred_test) * np.sum(
+        2 * np.abs(y_pred_test - y_true_test) / (np.abs(y_pred_test) + np.abs(y_true_test)))
+    print(f'Train SMAPE = {smape_train:.4}')
+    print(f'Test SMAPE = {smape_test:.4}')
+
+
+class LSTM(nn.Module):
+    def __init__(self, input_size: int = 1, hidden_size: int = 32,
+                 num_layers: int = 2, dropout: float = 0):
+        super(LSTM, self).__init__()
+        self.input_size = input_size
         self.hidden_size = hidden_size
-        self.num_layers_LSTM = num_layers_LSTM
+        self.num_layers = num_layers
 
-        self.lstm = nn.LSTM(input_size=1, hidden_size=hidden_size, 
-                            num_layers=num_layers_LSTM, dropout=dropout_LSTM, 
+        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size,
+                            num_layers=num_layers, dropout=dropout,
                             batch_first=True)
-        
+
         self.fc = nn.Linear(hidden_size, 1)
 
     def forward(self, x):
-        h_0 = torch.zeros(self.num_layers_LSTM, x.size(0), self.hidden_size).to(device).requires_grad_()
-        c_0 = torch.zeros(self.num_layers_LSTM, x.size(0), self.hidden_size).to(device).requires_grad_()
+        h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device).requires_grad_()
+        c_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device).requires_grad_()
 
         out, (h_n, c_n) = self.lstm(x, (h_0.detach(), c_0.detach()))
+
+        out = self.fc(out[:, -1, :])
+
+        return out
+
+
+class GRU(nn.Module):
+    def __init__(self, input_size: int = 1, hidden_size: int = 32,
+                 num_layers: int = 2, dropout: float = 0):
+        super(GRU, self).__init__()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+
+        self.gru = nn.GRU(input_size=input_size, hidden_size=hidden_size,
+                          num_layers=num_layers, dropout=dropout,
+                          batch_first=True)
+
+        self.fc = nn.Linear(hidden_size, 1)
+
+    def forward(self, x):
+        h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device).requires_grad_()
+        out, (h_n) = self.gru(x, (h_0.detach()))
 
         out = self.fc(out[:, -1, :])
 
