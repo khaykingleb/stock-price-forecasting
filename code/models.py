@@ -98,10 +98,8 @@ def eval_losses(y_pred_train, y_true_train, y_pred_test, y_true_test):
     print(f'Train MAE = {sum(np.abs(y_pred_train - y_true_train))[0]:.4}')
     print(f'Test MAE = {sum(np.abs(y_pred_test - y_true_test))[0]:.4}')
 
-    smape_train = 100 / len(y_pred_train) * np.sum(
-        2 * np.abs(y_pred_train - y_true_train) / (np.abs(y_pred_train) + np.abs(y_true_train)))
-    smape_test = 100 / len(y_pred_test) * np.sum(
-        2 * np.abs(y_pred_test - y_true_test) / (np.abs(y_pred_test) + np.abs(y_true_test)))
+    smape_train = 100 / len(y_pred_train) * np.sum(2 * np.abs(y_pred_train - y_true_train) / (np.abs(y_pred_train) + np.abs(y_true_train)))
+    smape_test = 100 / len(y_pred_test) * np.sum(2 * np.abs(y_pred_test - y_true_test) / (np.abs(y_pred_test) + np.abs(y_true_test)))
     print(f'Train SMAPE = {smape_train:.4}')
     print(f'Test SMAPE = {smape_test:.4}')
 
