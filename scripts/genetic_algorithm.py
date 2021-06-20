@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 import gc
+import numpy as np
 
 
 @dataclass
