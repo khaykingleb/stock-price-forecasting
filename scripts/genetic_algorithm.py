@@ -161,19 +161,19 @@ class GeneticAlgorithm:
         return offspring
 
     def mutate(self, individual: Individual) -> Individual:
-        if np.random.random() < config.mutation_rate:
+        if np.random.random() < self.config.mutation_rate:
             individual.hidden_size = 2 ** (np.log2(individual.hidden_size) + np.random.randint(-1, 2))
             individual.hidden_size = int(np.array(individual.hidden_size).clip(2 ** 3, 2 ** 9))
 
-        if np.random.random() < config.mutation_rate:
+        if np.random.random() < self.config.mutation_rate:
             individual.num_layers += np.random.randint(-2, 3)
             individual.num_layers = np.array(individual.num_layers).clip(2, 14)
 
-        if np.random.random() < config.mutation_rate:
+        if np.random.random() < self.config.mutation_rate:
             individual.learning_rate += round(np.random.uniform(-0.1, 0.1), 2)
             individual.learning_rate = np.array(individual.learning_rate).clip(0.001, 1)
 
-        if np.random.random() < config.mutation_rate:
+        if np.random.random() < self.config.mutation_rate:
             individual.num_epochs_base += np.random.randint(-30, 30)
             individual.num_epochs_base = np.array(individual.num_epochs_base).clip(10, 300)
 
