@@ -62,9 +62,8 @@ def predict(model, X, y_true, criterion, device):
     return test_loss
   
 
-def train(model, criterion, optimizer, X_train, y_train, X_test=None, y_test=None, 
-          n_epochs=10, verbose=True, return_loss_history=True, compute_test_loss=True,
-          device):
+def train(model, criterion, optimizer, device, X_train, y_train, X_test=None, y_test=None, 
+          n_epochs=10, verbose=True, return_loss_history=True, compute_test_loss=True):
     model.to(device)
 
     history_train_loss_by_epoch = []
