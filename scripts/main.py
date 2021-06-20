@@ -17,6 +17,25 @@ import torch
 from torch import nn
 from torch import optim
 
+import os
+import random
+
+def seed_everything(seed: int = 77):
+    random.seed(seed)
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    np.random.seed(seed)
+
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+
+    torch.backends.cudnn.enabled = False
+    torch.backends.cudnn.deterministic = True
+
+os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:2"
+
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+
 
 def plot_metric(title, train_metric=None, test_metric=None, val_metric=None):
     plt.title(title, pad=10, fontsize=18, loc='left', fontweight='bold')
@@ -93,3 +112,52 @@ def train(model, criterion, optimizer, device, X_train, y_train, X_test=None, y_
 
     if return_loss_history:
         return history_train_loss_by_epoch, history_test_loss_by_epoch
+
+
+class LSTM(nn.Module):
+    def __init__(self, input_size: int = 1, hidden_size: int = 32, 
+                 num_layers: int = 2, dropout: float = 0):
+        super(LSTM, self).__init__()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+
+        self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, 
+                            num_layers=num_layers, dropout=dropout, 
+                            batch_first=True)
+        
+        self.fc = nn.Linear(hidden_size, 1)
+
+    def forward(self, x):
+        h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device).requires_grad_()
+        c_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device).requires_grad_()
+
+        out, (h_n, c_n) = self.lstm(x, (h_0.detach(), c_0.detach()))
+
+        out = self.fc(out[:, -1, :])
+
+        return out
+    
+    
+class GRU(nn.Module):
+    def __init__(self, input_size: int = 1, hidden_size: int = 32, 
+                 num_layers: int = 2, dropout: float = 0):
+        super(GRU, self).__init__()
+        self.input_size = input_size
+        self.hidden_size = hidden_size
+        self.num_layers = num_layers
+        
+        self.gru = nn.GRU(input_size=input_size, hidden_size=hidden_size, 
+                          num_layers=num_layers, dropout=dropout,
+                          batch_first=True)
+        
+        self.fc = nn.Linear(hidden_size, 1)
+
+
+    def forward(self, x):
+        h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device).requires_grad_()
+        out, (h_n) = self.gru(x, (h_0.detach()))
+
+        out = self.fc(out[:, -1, :])
+
+        return out
