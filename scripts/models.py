@@ -37,7 +37,7 @@ def plot_metric(title, train_metric=None, test_metric=None, val_metric=None):
     plt.show()
     
 
-def train_one_epoch(model, X, y_true, criterion, optimizer):
+def train_one_epoch(model, X, y_true, criterion, optimizer, device):
     model.train()
     y_pred = model(X.to(device))
     loss = criterion(y_pred.unsqueeze(1), y_true.unsqueeze(1).to(device))
@@ -53,7 +53,7 @@ def train_one_epoch(model, X, y_true, criterion, optimizer):
     return train_loss
   
   
-def predict(model, X, y_true, criterion):
+def predict(model, X, y_true, criterion, device):
     model.eval()
     y_pred = model(X.to(device))
     loss = criterion(y_pred.unsqueeze(1), y_true.unsqueeze(1).to(device))
@@ -63,7 +63,8 @@ def predict(model, X, y_true, criterion):
   
 
 def train(model, criterion, optimizer, X_train, y_train, X_test=None, y_test=None, 
-          n_epochs=10, verbose=True, return_loss_history=True, compute_test_loss=True):
+          n_epochs=10, verbose=True, return_loss_history=True, compute_test_loss=True,
+          device):
     model.to(device)
 
     history_train_loss_by_epoch = []
@@ -76,7 +77,7 @@ def train(model, criterion, optimizer, X_train, y_train, X_test=None, y_test=Non
         if compute_test_loss:
             history_test_loss_by_epoch.append(predict(model, X_test, y_test, 
                                                       criterion))
-
+            
         if verbose:
             clear_output(wait=True)
             print(f"Epoch: {epoch + 1}") 
@@ -95,7 +96,7 @@ def train(model, criterion, optimizer, X_train, y_train, X_test=None, y_test=Non
 
       
 class LSTM(nn.Module):
-    def __init__(self, input_size: int = 1, hidden_size: int = 32, 
+    def __init__(self, device, input_size: int = 1, hidden_size: int = 32, 
                  num_layers: int = 2, dropout: float = 0):
         super(LSTM, self).__init__()
         self.input_size = input_size
@@ -120,7 +121,7 @@ class LSTM(nn.Module):
       
 
 class GRU(nn.Module):
-    def __init__(self, input_size: int = 1, hidden_size: int = 32, 
+    def __init__(self, device, input_size: int = 1, hidden_size: int = 32, 
                  num_layers: int = 2, dropout: float = 0):
         super(GRU, self).__init__()
         self.input_size = input_size
