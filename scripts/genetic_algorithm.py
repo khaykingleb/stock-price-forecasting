@@ -7,6 +7,8 @@ import torch
 from torch import nn
 from torch import optim
 
+import os
+import random
 
 def seed_everything(seed: int = 77):
     random.seed(seed)
@@ -20,9 +22,7 @@ def seed_everything(seed: int = 77):
     torch.backends.cudnn.enabled = False
     torch.backends.cudnn.deterministic = True
 
-import os
 os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:2"
-    
     
 
 @dataclass
