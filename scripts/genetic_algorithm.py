@@ -109,10 +109,10 @@ class GeneticAlgorithm:
 
             seed_everything(self.seed)
 
-            train(model, self.criterion, optimizer, X_val, y_val, individual.num_epochs_base, 
+            train(model, self.criterion, optimizer, device, X_val, y_val, individual.num_epochs_base, 
                   verbose=False, return_loss_history=False, compute_test_loss=False)
           
-            individual.loss = predict(model, X_val, y_val, self.criterion)
+            individual.loss = predict(model, X_val, y_val, self.criterion, device)
 
             losses.append(individual.loss)
 
