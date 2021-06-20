@@ -102,6 +102,7 @@ class LSTM(nn.Module):
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.num_layers = num_layers
+        self.device = device
 
         self.lstm = nn.LSTM(input_size=input_size, hidden_size=hidden_size, 
                             num_layers=num_layers, dropout=dropout, 
@@ -110,8 +111,8 @@ class LSTM(nn.Module):
         self.fc = nn.Linear(hidden_size, 1)
 
     def forward(self, x):
-        h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device).requires_grad_()
-        c_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device).requires_grad_()
+        h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(self.device).requires_grad_()
+        c_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(self.device).requires_grad_()
 
         out, (h_n, c_n) = self.lstm(x, (h_0.detach(), c_0.detach()))
 
@@ -127,6 +128,7 @@ class GRU(nn.Module):
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.num_layers = num_layers
+        self.device = device
         
         self.gru = nn.GRU(input_size=input_size, hidden_size=hidden_size, 
                           num_layers=num_layers, dropout=dropout,
@@ -136,7 +138,7 @@ class GRU(nn.Module):
 
 
     def forward(self, x):
-        h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device).requires_grad_()
+        h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(self.device).requires_grad_()
         out, (h_n) = self.gru(x, (h_0.detach()))
 
         out = self.fc(out[:, -1, :])
