@@ -72,11 +72,12 @@ def train(model, criterion, optimizer, X_train, y_train, X_test=None, y_test=Non
 
     for epoch in range(n_epochs):
         history_train_loss_by_epoch.append(train_one_epoch(model, X_train, y_train,
-                                                           criterion, optimizer))
+                                                           criterion, optimizer, 
+                                                           device))
         
         if compute_test_loss:
             history_test_loss_by_epoch.append(predict(model, X_test, y_test, 
-                                                      criterion))
+                                                      criterion, device))
             
         if verbose:
             clear_output(wait=True)
