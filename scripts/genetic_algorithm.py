@@ -1,11 +1,7 @@
 from dataclasses import dataclass
 import gc
 
-import numpy as np
-
-import torch
-from torch import nn
-from torch import optim
+from main import *
 
 
 @dataclass
