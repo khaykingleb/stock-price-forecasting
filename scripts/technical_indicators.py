@@ -1,12 +1,13 @@
 import pandas as pd
 from typing import Tuple
 
+
 def simple_moving_average(df: pd.DataFrame, n: int = 10, prices: str = 'Close') -> pd.Series:
   """
   Calculate simple n-day moving average for given data.
   
   Params:
-  
+      
   Returns:
   """
   return df[prices].rolling(window=n, min_periods=n).mean()
@@ -15,6 +16,7 @@ def simple_moving_average(df: pd.DataFrame, n: int = 10, prices: str = 'Close') 
 def weighted_moving_average(df: pd.DataFrame, n: int = 10, prices: str = 'Close') -> pd.Series:
   """
   Calculate weighted n-day moving average for given data.
+  
   Params:
       
   Returns:
@@ -25,6 +27,7 @@ def weighted_moving_average(df: pd.DataFrame, n: int = 10, prices: str = 'Close'
 def exponential_moving_average(df: pd.DataFrame, n: int = 10, prices: str = 'Close') -> pd.Series:
     """
     Calculate exponential n-day moving average for given data.
+    
     Params:
         
     Returns:
@@ -35,7 +38,9 @@ def exponential_moving_average(df: pd.DataFrame, n: int = 10, prices: str = 'Clo
 def relative_strength_index(df: pd.DataFrame, n: int, prices: str = 'Close') -> pd.Series:
   """
   Calculate n-day relative strength index for given data.
+  
   Params:
+  
   Returns:
   """
   deltas = df[prices].diff()
@@ -50,7 +55,9 @@ def stochastic_oscillator(df: pd.DataFrame, n_k: int = 14, n_d: int = 3,
                           prices: str = 'Close', d_type: str = 'sma') -> pd.Series:
   """
   Calculate n-day stochastic %K and %D for given data.
+  
   Params:
+  
   Returns:
   """
   highest_high = df[prices].rolling(window=n_k, min_periods=n_k).max()
@@ -73,6 +80,7 @@ def stochastic_oscillator(df: pd.DataFrame, n_k: int = 14, n_d: int = 3,
 def bollinger_bands(df: pd.DataFrame, n: int = 20, m: float = 2.0) -> Tuple[pd.Series]:
   """
   Calculate bollinger bands for given data.
+  
   Params:
       n: number of days in smoothing period
       m: number of standard deviations away from moving avergae
@@ -94,6 +102,7 @@ def moving_average_convergence_divergence(df: pd.DataFrame, n_fast: int = 12,
                                           n_slow: int = 26, n_signal: int = 9) -> Tuple[pd.Series]:
     """
     Calculate MACD, MACD Signal and MACD difference for given data.
+    
     Params:
         n_fast:
         n_slow:
