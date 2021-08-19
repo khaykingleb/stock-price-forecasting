@@ -161,3 +161,4 @@ class GRU(nn.Module):
         out = self.fc(out[:, -1, :])
 
         return out
+    
