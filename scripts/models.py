@@ -1,45 +1,15 @@
-import matplotlib as mpl
 import matplotlib.pyplot as plt
-plt.rcParams.update({
-    "text.usetex": False,
-    "font.family": "DejaVu Sans",
-    "font.sans-serif": ["Benton Sans"]})
-
 from IPython.display import clear_output
-
-from matplotlib.pylab import rcParams
-rcParams['figure.figsize'] = 10, 8
-
-import pandas as pd
-import numpy as np
 
 import torch
 from torch import nn
-from torch import optim
-
-import os
-import random
-
-def seed_everything(seed: int = 77):
-    random.seed(seed)
-    os.environ['PYTHONHASHSEED'] = str(seed)
-    np.random.seed(seed)
-
-    torch.manual_seed(seed)
-    torch.cuda.manual_seed(seed)
-    torch.cuda.manual_seed_all(seed)
-
-    torch.backends.cudnn.enabled = False
-    torch.backends.cudnn.deterministic = True
-
-os.environ["CUBLAS_WORKSPACE_CONFIG"] = ":4096:2"
 
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
 
 def plot_metric(title, train_metric=None, test_metric=None, val_metric=None):
     plt.title(title, pad=10, fontsize=18, loc='left', fontweight='bold')
-    plt.ylabel('Loss', labelpad=10, fontsize=14)
+    plt.ylabel('Loss', labelpad=10, fontsize=14) 
     plt.xlabel('Epoch', labelpad=10, fontsize=14)
 
     if train_metric:
