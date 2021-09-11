@@ -25,7 +25,6 @@ def plot_metric(title, train_metric=None, test_metric=None, val_metric=None):
     plt.legend()
     plt.show()
     
-
 def train_one_epoch(model, X, y_true, criterion, optimizer, device):
     model.train()
     y_pred = model(X.to(device))
@@ -41,7 +40,6 @@ def train_one_epoch(model, X, y_true, criterion, optimizer, device):
 
     return train_loss
   
-  
 def predict(model, X, y_true, criterion, device):
     model.eval()
     y_pred = model(X.to(device))
@@ -49,7 +47,6 @@ def predict(model, X, y_true, criterion, device):
     test_loss = loss.item()
 
     return test_loss
-  
 
 def train(model, criterion, optimizer, device, X_train, y_train, X_test=None, y_test=None, 
           n_epochs=10, verbose=True, return_loss_history=True, compute_test_loss=True):
@@ -122,7 +119,6 @@ class GRU(nn.Module):
                           batch_first=True)
         
         self.fc = nn.Linear(hidden_size, 1)
-
 
     def forward(self, x):
         h_0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).to(device).requires_grad_()
