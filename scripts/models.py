@@ -25,13 +25,14 @@ def plot_metric(title, train_metric=None, test_metric=None, val_metric=None):
     plt.legend()
     plt.show()
     
+    
 def train_one_epoch(model, X, y_true, criterion, optimizer, device):
     model.train()
     y_pred = model(X.to(device))
     loss = criterion(y_pred.unsqueeze(1), y_true.unsqueeze(1).to(device))
     train_loss = loss.item()
     
-    # prevent the exploding gradient problem
+    # Prevent the exploding gradient problem
     nn.utils.clip_grad_norm_(model.parameters(), 5)
     
     loss.backward()
@@ -40,6 +41,7 @@ def train_one_epoch(model, X, y_true, criterion, optimizer, device):
 
     return train_loss
   
+    
 def predict(model, X, y_true, criterion, device):
     model.eval()
     y_pred = model(X.to(device))
@@ -47,6 +49,7 @@ def predict(model, X, y_true, criterion, device):
     test_loss = loss.item()
 
     return test_loss
+
 
 def train(model, criterion, optimizer, device, X_train, y_train, X_test=None, y_test=None, 
           n_epochs=10, verbose=True, return_loss_history=True, compute_test_loss=True):
