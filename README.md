@@ -1,5 +1,5 @@
 # Stock Price Forecasting
-GA-optimized RNNs with the use of technical indicators as a additional features: 
+GA-optimized RNNs with the use of technical indicators as additional features: 
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/khaykingleb/Stock-Price-Forecasting/blob/main/scripts/main.ipynb)
 
