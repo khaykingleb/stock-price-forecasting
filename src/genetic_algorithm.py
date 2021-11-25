@@ -7,7 +7,7 @@ import numpy as np
 import random
 import os
 
-from models import *
+from src.models import *
 
 
 # To eliminate randomness
